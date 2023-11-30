@@ -1,0 +1,35 @@
+services:
+  nextcloud-aio-mastercontainer:
+    image: nextcloud/all-in-one
+    restart: always
+    ports:
+      - "8080:8080"  # Port pour accéder à Nextcloud
+      - "82:82"
+      - "8443:8443"
+    volumes:
+      - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - APACHE_PORT=8080
+    networks:
+      - functionnal_default
+
+  aio-onlyoffice:
+    image: nextcloud/aio-onlyoffice
+    restart: always
+    depends_on:
+      - nextcloud-aio-mastercontainer
+    environment:
+      - APACHE_PORT=8080
+      - NEXTCLOUD_URL=http://nextcloud.delhomme.ovh:8080  # URL de Nextcloud AIO
+    ports:
+      - "8081:8080"  # Port pour accéder à OnlyOffice
+    networks:
+      - functionnal_default
+
+volumes:
+  nextcloud_aio_mastercontainer:
+
+networks:
+  functionnal_default:
+    external: true
